@@ -2,17 +2,73 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiAppMinhasCompras.Views.ListaProduto"
-             Title="Minhas Compras">
-
+             Title="Minhas Compras"
+             BackgroundColor="#F0F4F8">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Somar" />
+        <ToolbarItem Text="Somar" Clicked="ToolbarItem_Somar" />
         <ToolbarItem Text="Adicionar" Clicked="ToolbarItem_Adicionar" />
     </ContentPage.ToolbarItems>
-    
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <Grid RowDefinitions="Auto, *" Padding="15,15,15,0">
+
+        <Border Grid.Row="0" Margin="0,0,0,15" Stroke="#CBD5E1" StrokeThickness="1" BackgroundColor="White">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
+            <SearchBar x:Name="txt_search" 
+                       Placeholder="Busca de produtos..."
+                       TextChanged="txt_search_TextChanged"
+                       BackgroundColor="Transparent"
+                       CancelButtonColor="#64748B"
+                       TextColor="#1E293B" />
+        </Border>
+
+        <Border Grid.Row="1" Margin="0,0,0,15" Stroke="#CBD5E1" StrokeThickness="1" BackgroundColor="White">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16" />
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="#0F172A" Offset="0,4" Radius="10" Opacity="0.05" />
+            </Border.Shadow>
+
+            <ListView x:Name="lst_produtos"
+                      HasUnevenRows="True"
+                      SeparatorColor="#E2E8F0"
+                      BackgroundColor="Transparent">
+
+                <ListView.Header>
+                    <Grid ColumnDefinitions="40, *, 80, 50, 90" BackgroundColor="#F8FAFC" Padding="15,10">
+                        <Label Grid.Column="0" Text="ID" FontSize="12" FontAttributes="Bold" TextColor="#64748B" />
+                        <Label Grid.Column="1" Text="DESCRIÇÃO" FontSize="12" FontAttributes="Bold" TextColor="#64748B" />
+                        <Label Grid.Column="2" Text="PREÇO" FontSize="12" FontAttributes="Bold" TextColor="#64748B" HorizontalTextAlignment="End" />
+                        <Label Grid.Column="3" Text="QTD" FontSize="12" FontAttributes="Bold" TextColor="#64748B" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="4" Text="TOTAL" FontSize="12" FontAttributes="Bold" TextColor="#64748B" HorizontalTextAlignment="End" />
+                    </Grid>
+                </ListView.Header>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.ContextActions>
+                                <MenuItem Text="Remover" Clicked="MenuItem_Remover" CommandParameter="{Binding Id}" IsDestructive="True" />
+                            </ViewCell.ContextActions>
+
+                            <Grid ColumnDefinitions="40, *, 80, 50, 90" Padding="15" VerticalOptions="Center">
+
+                                <Label Grid.Column="0" Text="{Binding Id}" FontSize="13" TextColor="#94A3B8" VerticalOptions="Center" />
+
+                                <Label Grid.Column="1" Text="{Binding Descricao}" FontSize="14" FontAttributes="Bold" TextColor="#1E293B" VerticalOptions="Center" LineBreakMode="TailTruncation" />
+
+                                <Label Grid.Column="2" Text="{Binding Preco, StringFormat='{}{0:C2}'}" FontSize="14" TextColor="#475569" HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                <Label Grid.Column="3" Text="{Binding Quantidade}" FontSize="14" TextColor="#475569" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+
+                                <Label Grid.Column="4" Text="{Binding Total, StringFormat='{}{0:C2}'}" FontSize="14" FontAttributes="Bold" TextColor="#0EA5E9" HorizontalTextAlignment="End" VerticalOptions="Center" />
+
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+    </Grid>
 </ContentPage>

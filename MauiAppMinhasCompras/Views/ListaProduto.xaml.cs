@@ -5,7 +5,7 @@ namespace MauiAppMinhasCompras.Views;
 
 public partial class ListaProduto : ContentPage
 {
-    private List<Produto> _listaCompletaNaMemoria = new List<Produto>();
+    private ObservableCollection<Produto> _listaCompletaNaMemoria = new ObservableCollection<Produto>();
 
     public ListaProduto()
 	{
@@ -14,9 +14,17 @@ public partial class ListaProduto : ContentPage
 
     protected override async void OnAppearing()
     {
-        base.OnAppearing();
-        _listaCompletaNaMemoria = await App.Db.GetAll();
-        lst_produtos.ItemsSource = _listaCompletaNaMemoria;
+        try
+        {
+            base.OnAppearing();
+            var lista = await App.Db.GetAll();
+            _listaCompletaNaMemoria = new ObservableCollection<Produto>(lista);
+            lst_produtos.ItemsSource = _listaCompletaNaMemoria;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Ops", ex.Message, "OK");
+        }
     }
 
     private void ToolbarItem_Adicionar(object sender, EventArgs e)
@@ -35,12 +43,16 @@ public partial class ListaProduto : ContentPage
     {
 		try
 		{
-			var idProduto = (int)((MenuItem)sender).CommandParameter;
+            var selecionado = sender as MenuItem;
+            Produto produto = selecionado.BindingContext as Produto;
 
-            await App.Db.Delete(idProduto);
-            await CarregarProdutos();
+            bool confirm = await DisplayAlertAsync("Tem certeza?", $"Remover {produto.Descricao}?", "Sim", "Não");
 
-            await DisplayAlertAsync("Sucesso", "Item removido.", "OK");
+            if (confirm)
+            {
+                await App.Db.Delete(produto.Id);
+                _listaCompletaNaMemoria.Remove(produto);
+            }
         }
 		catch (Exception ex)
 		{
@@ -64,7 +76,7 @@ public partial class ListaProduto : ContentPage
                             .Where(produto => produto.Descricao.ToLower().Contains(textoDigitado))
                             .ToList();
 
-                lst_produtos.ItemsSource = listaFiltrada;
+                _listaCompletaNaMemoria = new ObservableCollection<Produto>(listaFiltrada);
             }
         }
         catch (Exception ex)
@@ -83,7 +95,7 @@ public partial class ListaProduto : ContentPage
     {
         try
         {
-            double soma = ((List<Produto>)lst_produtos.ItemsSource).Sum(p => p.Total);
+            double soma = ((ObservableCollection<Produto>)lst_produtos.ItemsSource).Sum(p => p.Total);
 
             string mensagem = $"O total é {soma:C}";
 
@@ -94,5 +106,22 @@ public partial class ListaProduto : ContentPage
             await DisplayAlertAsync("Ops", ex.Message, "OK");
         }
         
+    }
+
+    private void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+    {
+        try
+        {
+            Produto produto = e.SelectedItem as Produto;
+
+            Navigation.PushAsync(new Views.EditarProduto
+            {
+                BindingContext = produto
+            });
+        }
+        catch (Exception ex)
+        {
+            DisplayAlertAsync("Ops", ex.Message, "OK");
+        }
     }
 }

@@ -28,7 +28,8 @@ public partial class NovoProduto : ContentPage
 
 			var quantidadeInserido = await App.Db.Insert(produto);
 			await DisplayAlertAsync("Sucesso!", $"{quantidadeInserido} registro inserido", "OK");
-		}
+			await Navigation.PopAsync();
+        }
 		catch (Exception ex)
 		{
             await DisplayAlertAsync("Ops", ex.Message, "OK");

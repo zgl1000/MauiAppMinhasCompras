@@ -34,7 +34,8 @@
             <ListView x:Name="lst_produtos"
                       HasUnevenRows="True"
                       SeparatorColor="#E2E8F0"
-                      BackgroundColor="Transparent">
+                      BackgroundColor="Transparent"
+                      ItemSelected="lst_produtos_ItemSelected">
 
                 <ListView.Header>
                     <Grid ColumnDefinitions="40, *, 80, 50, 90" BackgroundColor="#F8FAFC" Padding="15,10">
@@ -50,7 +51,7 @@
                     <DataTemplate>
                         <ViewCell>
                             <ViewCell.ContextActions>
-                                <MenuItem Text="Remover" Clicked="MenuItem_Remover" CommandParameter="{Binding Id}" IsDestructive="True" />
+                                <MenuItem Text="Remover" Clicked="MenuItem_Remover" IsDestructive="True" />
                             </ViewCell.ContextActions>
 
                             <Grid ColumnDefinitions="40, *, 80, 50, 90" Padding="15" VerticalOptions="Center">

@@ -32,6 +32,8 @@
             </Border.Shadow>
 
             <ListView x:Name="lst_produtos"
+                      IsPullToRefreshEnabled="True"
+                      Refreshing="lst_produtos_Refreshing"
                       HasUnevenRows="True"
                       SeparatorColor="#E2E8F0"
                       BackgroundColor="Transparent"

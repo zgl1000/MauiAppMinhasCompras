@@ -66,6 +66,8 @@ public partial class ListaProduto : ContentPage
         {
             string textoDigitado = e.NewTextValue.ToLower();
 
+            lst_produtos.IsRefreshing = true;
+
             if (string.IsNullOrWhiteSpace(textoDigitado))
             {
                 lst_produtos.ItemsSource = _listaCompletaNaMemoria;
@@ -76,14 +78,17 @@ public partial class ListaProduto : ContentPage
                             .Where(produto => produto.Descricao.ToLower().Contains(textoDigitado))
                             .ToList();
 
-                _listaCompletaNaMemoria = new ObservableCollection<Produto>(listaFiltrada);
+                lst_produtos.ItemsSource = new ObservableCollection<Produto>(listaFiltrada);
             }
         }
         catch (Exception ex)
         {
             await DisplayAlertAsync("Ops", ex.Message, "OK");
         }
-        
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
+        }
     }
 
     private async Task CarregarProdutos()
@@ -122,6 +127,25 @@ public partial class ListaProduto : ContentPage
         catch (Exception ex)
         {
             DisplayAlertAsync("Ops", ex.Message, "OK");
+        }
+    }
+
+    private async void lst_produtos_Refreshing(object sender, EventArgs e)
+    {
+        try
+        {
+            base.OnAppearing();
+            var lista = await App.Db.GetAll();
+            _listaCompletaNaMemoria = new ObservableCollection<Produto>(lista);
+            lst_produtos.ItemsSource = _listaCompletaNaMemoria;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Ops", ex.Message, "OK");
+        }
+        finally
+        {
+            lst_produtos.IsRefreshing = false;
         }
     }
 }

@@ -20,12 +20,6 @@ public partial class NovoProduto : ContentPage
 				Preco = Convert.ToDouble(txt_preco.Text)
 			};
 
-			if (string.IsNullOrWhiteSpace(produto.Descricao) || produto.Quantidade <= 0 || produto.Preco <= 0)
-			{
-                await DisplayAlertAsync("Erro!", "Preencha todos os campos!", "OK");
-				return;
-            }
-
 			var quantidadeInserido = await App.Db.Insert(produto);
 			await DisplayAlertAsync("Sucesso!", $"{quantidadeInserido} registro inserido", "OK");
 			await Navigation.PopAsync();

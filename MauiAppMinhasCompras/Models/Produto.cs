@@ -31,6 +31,8 @@ namespace MauiAppMinhasCompras.Models
                 {
                     throw new ArgumentException("A quantidade deve ser maior que zero");
                 }
+
+                _quantidade = value;
             } 
         }
         public double Preco  { get; set; }

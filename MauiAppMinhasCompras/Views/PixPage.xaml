@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiAppMinhasCompras.Views.PixPage"
+             Title="Pagamento PIX"
+             BackgroundColor="#F8F7F3">
+
+    <VerticalStackLayout Padding="24" Spacing="24" VerticalOptions="Center">
+
+        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+            <Label Text="Total a pagar"
+                   FontSize="13"
+                   TextColor="#888780"
+                   HorizontalOptions="Center"/>
+            <Label x:Name="lbl_valor"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   TextColor="#2C2C2A"
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <Border x:Name="border_qr"
+                BackgroundColor="White"
+                Stroke="#D3D1C7"
+                StrokeThickness="0.5"
+                HorizontalOptions="Center"
+                Padding="16">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16"/>
+            </Border.StrokeShape>
+            <Image x:Name="img_qrcode"
+                   WidthRequest="220"
+                   HeightRequest="220"/>
+        </Border>
+
+        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+            <Label Text="Chave PIX"
+                   FontSize="12"
+                   TextColor="#888780"
+                   HorizontalOptions="Center"/>
+            <Label x:Name="lbl_chave"
+                   FontSize="14"
+                   TextColor="#534AB7"
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <Border BackgroundColor="#534AB7"
+                Stroke="Transparent"
+                StrokeThickness="0"
+                HorizontalOptions="Fill">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12"/>
+            </Border.StrokeShape>
+            <Button Text="Copiar código PIX"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    FontSize="15"
+                    Padding="0,14"
+                    Clicked="btn_copiar_Clicked"/>
+        </Border>
+
+    </VerticalStackLayout>
+</ContentPage>

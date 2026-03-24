@@ -2,76 +2,194 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiAppMinhasCompras.Views.ListaProduto"
-             Title="Minhas Compras"
-             BackgroundColor="#F0F4F8">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Somar" Clicked="ToolbarItem_Somar" />
-        <ToolbarItem Text="Adicionar" Clicked="ToolbarItem_Adicionar" />
-    </ContentPage.ToolbarItems>
+             Title=""
+             BackgroundColor="#F8F7F3"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
 
-    <Grid RowDefinitions="Auto, *" Padding="15,15,15,0">
+    <Grid RowDefinitions="Auto, *, Auto">
 
-        <Border Grid.Row="0" Margin="0,0,0,15" Stroke="#CBD5E1" StrokeThickness="1" BackgroundColor="White">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="12" />
-            </Border.StrokeShape>
-            <SearchBar x:Name="txt_search" 
-                       Placeholder="Busca de produtos..."
-                       TextChanged="txt_search_TextChanged"
-                       BackgroundColor="Transparent"
-                       CancelButtonColor="#64748B"
-                       TextColor="#1E293B" />
-        </Border>
+        <Grid Grid.Row="0" BackgroundColor="#2C2C2A" Padding="18,50,18,16" RowDefinitions="Auto,Auto" RowSpacing="12">
 
-        <Border Grid.Row="1" Margin="0,0,0,15" Stroke="#CBD5E1" StrokeThickness="1" BackgroundColor="White">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="16" />
-            </Border.StrokeShape>
-            <Border.Shadow>
-                <Shadow Brush="#0F172A" Offset="0,4" Radius="10" Opacity="0.05" />
-            </Border.Shadow>
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                <Label Text="Minhas Compras"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#F1EFE8"
+                       VerticalOptions="Center"/>
 
-            <ListView x:Name="lst_produtos"
-                      IsPullToRefreshEnabled="True"
-                      Refreshing="lst_produtos_Refreshing"
-                      HasUnevenRows="True"
-                      SeparatorColor="#E2E8F0"
-                      BackgroundColor="Transparent"
-                      ItemSelected="lst_produtos_ItemSelected">
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <Border BackgroundColor="#1F1F1D"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        WidthRequest="34" HeightRequest="34"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <Ellipse/>
+                        </Border.StrokeShape>
+                        <ImageButton Source="icon_add.png"
+                                 BackgroundColor="Transparent"
+                                 Padding="0"
+                                 Margin="0"
+                                 Aspect="AspectFit"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 WidthRequest="34"
+                                 HeightRequest="34"
+                                 MinimumWidthRequest="0"
+                                 MinimumHeightRequest="0"
+                                 Clicked="ToolbarItem_Adicionar"/>
+                    </Border>
+                </HorizontalStackLayout>
+            </Grid>
 
-                <ListView.Header>
-                    <Grid ColumnDefinitions="40, *, 80, 50, 90" BackgroundColor="#F8FAFC" Padding="15,10">
-                        <Label Grid.Column="0" Text="ID" FontSize="12" FontAttributes="Bold" TextColor="#64748B" />
-                        <Label Grid.Column="1" Text="DESCRIÇÃO" FontSize="12" FontAttributes="Bold" TextColor="#64748B" />
-                        <Label Grid.Column="2" Text="PREÇO" FontSize="12" FontAttributes="Bold" TextColor="#64748B" HorizontalTextAlignment="End" />
-                        <Label Grid.Column="3" Text="QTD" FontSize="12" FontAttributes="Bold" TextColor="#64748B" HorizontalTextAlignment="Center" />
-                        <Label Grid.Column="4" Text="TOTAL" FontSize="12" FontAttributes="Bold" TextColor="#64748B" HorizontalTextAlignment="End" />
-                    </Grid>
-                </ListView.Header>
+            <Border Grid.Row="1"
+                    BackgroundColor="#3D3D3A"
+                    Stroke="Transparent"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10"/>
+                </Border.StrokeShape>
+                <SearchBar x:Name="txt_search"
+                           Placeholder="Buscar produto..."
+                           PlaceholderColor="#888780"
+                           TextColor="#F1EFE8"
+                           BackgroundColor="Transparent"
+                           CancelButtonColor="#B4B2A9"
+                           TextChanged="txt_search_TextChanged"/>
+            </Border>
+        </Grid>
 
-                <ListView.ItemTemplate>
+        <RefreshView Grid.Row="1"
+                     x:Name="refresh_view"
+                     Refreshing="lst_produtos_Refreshing"
+                     RefreshColor="#534AB7">
+            <CollectionView x:Name="lst_produtos"
+                            Margin="12,12,12,0"
+                            SelectionChanged="lst_produtos_SelectionChanged"
+                            SelectionMode="Single">
+
+                <CollectionView.Header>
+                    <Label Margin="4,0,0,8"
+                           FontSize="11"
+                           TextColor="#888780"
+                           x:Name="lbl_contagem"
+                           Text="0 itens"/>
+                </CollectionView.Header>
+
+                <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <ViewCell>
-                            <ViewCell.ContextActions>
-                                <MenuItem Text="Remover" Clicked="MenuItem_Remover" IsDestructive="True" />
-                            </ViewCell.ContextActions>
+                        <SwipeView Margin="0,0,0,8">
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Remover"
+                                               BackgroundColor="#E24B4A"
+                                               Invoked="MenuItem_Remover"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
 
-                            <Grid ColumnDefinitions="40, *, 80, 50, 90" Padding="15" VerticalOptions="Center">
+                            <Border BackgroundColor="White"
+                                    Stroke="#D3D1C7"
+                                    StrokeThickness="0.5">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12"/>
+                                </Border.StrokeShape>
 
-                                <Label Grid.Column="0" Text="{Binding Id}" FontSize="13" TextColor="#94A3B8" VerticalOptions="Center" />
+                                <Grid ColumnDefinitions="44, *, Auto"
+                                      Padding="14,12"
+                                      ColumnSpacing="10">
 
-                                <Label Grid.Column="1" Text="{Binding Descricao}" FontSize="14" FontAttributes="Bold" TextColor="#1E293B" VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                                    <Border Grid.Column="0"
+                                            BackgroundColor="#EEEDFE"
+                                            WidthRequest="36" HeightRequest="36"
+                                            Stroke="Transparent" StrokeThickness="0"
+                                            VerticalOptions="Center">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding Emoji}"
+                                               FontSize="18"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Border>
 
-                                <Label Grid.Column="2" Text="{Binding Preco, StringFormat='{}{0:C2}'}" FontSize="14" TextColor="#475569" HorizontalTextAlignment="End" VerticalOptions="Center" />
-                                <Label Grid.Column="3" Text="{Binding Quantidade}" FontSize="14" TextColor="#475569" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                        <Label Text="{Binding Descricao}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="#2C2C2A"
+                                               LineBreakMode="TailTruncation"/>
+                                        <Label FontSize="11" TextColor="#888780">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Quantidade}"/>
+                                                    <Span Text=" un × "/>
+                                                    <Span Text="{Binding Preco, StringFormat='{0:C2}'}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
 
-                                <Label Grid.Column="4" Text="{Binding Total, StringFormat='{}{0:C2}'}" FontSize="14" FontAttributes="Bold" TextColor="#0EA5E9" HorizontalTextAlignment="End" VerticalOptions="Center" />
-
-                            </Grid>
-                        </ViewCell>
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Total, StringFormat='{0:C2}'}"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           TextColor="#534AB7"
+                                           VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+                        </SwipeView>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Margin="0,60,0,0">
+                        <Label Text="🛒" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Nenhum produto ainda" FontSize="15" TextColor="#888780" HorizontalOptions="Center"/>
+                        <Label Text="Toque em + para adicionar" FontSize="13" TextColor="#B4B2A9" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+            </CollectionView>
+        </RefreshView>
+
+        <Border Grid.Row="2"
+        BackgroundColor="White"
+        Stroke="#D3D1C7"
+        StrokeThickness="0.5">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0"/>
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*, Auto" Padding="18,12,18,28">
+
+                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Total estimado"
+                   FontSize="12"
+                   TextColor="#888780"/>
+                    <Label x:Name="lbl_total"
+                   Text="R$ 0,00"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="#2C2C2A"/>
+                </VerticalStackLayout>
+
+                <!-- FAB botão de adicionar -->
+                <Border Grid.Column="1"
+                BackgroundColor="#534AB7"
+                WidthRequest="44" HeightRequest="44"
+                Stroke="Transparent" StrokeThickness="0"
+                VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <Ellipse/>
+                    </Border.StrokeShape>
+                    <ImageButton Source="icon_bag.png"
+                         BackgroundColor="Transparent"
+                         Padding="10"
+                         Clicked="ToolbarItem_Somar"/>
+                </Border>
+            </Grid>
         </Border>
+
     </Grid>
 </ContentPage>

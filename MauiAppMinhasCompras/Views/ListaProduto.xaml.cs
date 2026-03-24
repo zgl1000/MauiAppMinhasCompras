@@ -6,10 +6,11 @@ namespace MauiAppMinhasCompras.Views;
 public partial class ListaProduto : ContentPage
 {
     private ObservableCollection<Produto> _listaCompletaNaMemoria = new ObservableCollection<Produto>();
+    private bool _navegando = false;
 
     public ListaProduto()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
     }
 
     protected override async void OnAppearing()
@@ -20,30 +21,32 @@ public partial class ListaProduto : ContentPage
             var lista = await App.Db.GetAll();
             _listaCompletaNaMemoria = new ObservableCollection<Produto>(lista);
             lst_produtos.ItemsSource = _listaCompletaNaMemoria;
+
+            AtualizarRodape();
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Ops", ex.Message, "OK");
+            await DisplayAlertAsync("Ops", ex.Message, "OK"); // ✅ era DisplayAlertAsyncAsync
         }
     }
 
     private void ToolbarItem_Adicionar(object sender, EventArgs e)
     {
-		try
-		{
-			Navigation.PushAsync(new Views.NovoProduto());
-		}
-		catch (Exception ex)
-		{
-			DisplayAlertAsync("Ops", ex.Message, "OK");
-		}
+        try
+        {
+            Navigation.PushAsync(new Views.NovoProduto());
+        }
+        catch (Exception ex)
+        {
+            DisplayAlertAsync("Ops", ex.Message, "OK"); // ✅ era DisplayAlertAsyncAsync
+        }
     }
 
     private async void MenuItem_Remover(object sender, EventArgs e)
     {
-		try
-		{
-            var selecionado = sender as MenuItem;
+        try
+        {
+            var selecionado = sender as SwipeItem; // ✅ era MenuItem, agora é SwipeItem
             Produto produto = selecionado.BindingContext as Produto;
 
             bool confirm = await DisplayAlertAsync("Tem certeza?", $"Remover {produto.Descricao}?", "Sim", "Não");
@@ -52,10 +55,11 @@ public partial class ListaProduto : ContentPage
             {
                 await App.Db.Delete(produto.Id);
                 _listaCompletaNaMemoria.Remove(produto);
+                AtualizarRodape(); // ✅ atualiza total ao remover
             }
         }
-		catch (Exception ex)
-		{
+        catch (Exception ex)
+        {
             await DisplayAlertAsync("Ops", ex.Message, "OK");
         }
     }
@@ -66,7 +70,7 @@ public partial class ListaProduto : ContentPage
         {
             string textoDigitado = e.NewTextValue.ToLower();
 
-            lst_produtos.IsRefreshing = true;
+            refresh_view.IsRefreshing = true;
 
             if (string.IsNullOrWhiteSpace(textoDigitado))
             {
@@ -75,11 +79,13 @@ public partial class ListaProduto : ContentPage
             else
             {
                 var listaFiltrada = _listaCompletaNaMemoria
-                            .Where(produto => produto.Descricao.ToLower().Contains(textoDigitado))
-                            .ToList();
+                    .Where(p => p.Descricao.ToLower().StartsWith(textoDigitado))
+                    .ToList();
 
                 lst_produtos.ItemsSource = new ObservableCollection<Produto>(listaFiltrada);
             }
+
+            AtualizarRodape();
         }
         catch (Exception ex)
         {
@@ -87,46 +93,7 @@ public partial class ListaProduto : ContentPage
         }
         finally
         {
-            lst_produtos.IsRefreshing = false;
-        }
-    }
-
-    private async Task CarregarProdutos()
-    {
-        lst_produtos.ItemsSource = await App.Db.GetAll();
-    }
-
-    private async void ToolbarItem_Somar(object sender, EventArgs e)
-    {
-        try
-        {
-            double soma = ((ObservableCollection<Produto>)lst_produtos.ItemsSource).Sum(p => p.Total);
-
-            string mensagem = $"O total é {soma:C}";
-
-            await DisplayAlertAsync("Total dos produtos", mensagem, "OK");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlertAsync("Ops", ex.Message, "OK");
-        }
-        
-    }
-
-    private void lst_produtos_ItemSelected(object sender, SelectedItemChangedEventArgs e)
-    {
-        try
-        {
-            Produto produto = e.SelectedItem as Produto;
-
-            Navigation.PushAsync(new Views.EditarProduto
-            {
-                BindingContext = produto
-            });
-        }
-        catch (Exception ex)
-        {
-            DisplayAlertAsync("Ops", ex.Message, "OK");
+            refresh_view.IsRefreshing = false;
         }
     }
 
@@ -134,10 +101,11 @@ public partial class ListaProduto : ContentPage
     {
         try
         {
-            base.OnAppearing();
             var lista = await App.Db.GetAll();
             _listaCompletaNaMemoria = new ObservableCollection<Produto>(lista);
             lst_produtos.ItemsSource = _listaCompletaNaMemoria;
+
+            AtualizarRodape();
         }
         catch (Exception ex)
         {
@@ -145,7 +113,57 @@ public partial class ListaProduto : ContentPage
         }
         finally
         {
-            lst_produtos.IsRefreshing = false;
+            refresh_view.IsRefreshing = false;
+        }
+    }
+
+    private async void lst_produtos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_navegando) return; // ✅ evita loop
+
+        try
+        {
+            var produto = e.CurrentSelection.FirstOrDefault() as Produto;
+
+            if (produto == null) return;
+
+            _navegando = true;
+            lst_produtos.SelectedItem = null;
+
+            await Navigation.PushAsync(new Views.EditarProduto
+            {
+                BindingContext = produto
+            });
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Ops", ex.Message, "OK");
+        }
+        finally
+        {
+            _navegando = false; // ✅ sempre libera a flag
+        }
+    }
+
+    // ✅ Atualiza lbl_total e lbl_contagem no rodapé automaticamente
+    private void AtualizarRodape()
+    {
+        var lista = _listaCompletaNaMemoria;
+        lbl_total.Text = lista.Sum(p => p.Total).ToString("C");
+        lbl_contagem.Text = $"{lista.Count} {(lista.Count == 1 ? "item" : "itens")}";
+    }
+
+    // ✅ Botão Somar agora só exibe o DisplayAlertAsync com o total atual
+    private async void ToolbarItem_Somar(object sender, EventArgs e)
+    {
+        try
+        {
+            double total = _listaCompletaNaMemoria.Sum(p => p.Total);
+            await Navigation.PushAsync(new Views.PixPage(total));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Ops", ex.Message, "OK");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using MauiAppMinhasCompras.Helpers;
+using SQLite;
 
 namespace MauiAppMinhasCompras.Models
 {
@@ -37,5 +38,8 @@ namespace MauiAppMinhasCompras.Models
         }
         public double Preco  { get; set; }
         public double Total { get => Quantidade * Preco; }
+
+        [Ignore]
+        public string Emoji => EmojiHelper.ObterEmoji(Descricao ?? string.Empty);
     }
 }

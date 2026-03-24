@@ -29,8 +29,12 @@ namespace MauiAppMinhasCompras
         protected override Window CreateWindow(IActivationState? activationState)
         {
             //return new Window(new AppShell());
+            
+            var window = new Window(new NavigationPage(new Views.ListaProduto()));
 
-            return new Window(new NavigationPage(new Views.ListaProduto()));
+            NavigationPage.SetHasNavigationBar(window, false);
+
+            return window;
         }
     }
 }
